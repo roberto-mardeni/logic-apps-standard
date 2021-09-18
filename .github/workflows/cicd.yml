@@ -61,3 +61,28 @@ jobs:
         deploymentName: azure-${{ env.NAME }}-${{ steps.date.outputs.date }}
         template: ./src/ArmTemplates/azure.json
         parameters: name=${{ env.LA_NAME }} environmentName=${{ env.NAME }}
+
+    - uses: actions/download-artifact@master
+      with:
+        name: workflow
+        path: ./output/
+
+    - name: Get publish Profile
+      id: publishprofile
+      uses: azure/powershell@v1
+      with:
+        inlineScript: |
+          $profile = Get-AzWebAppPublishingProfile `
+              -ResourceGroupName ${{ env.RG }} `
+              -Name ${{ env.LA_NAME }}
+          $profile = $profile.Replace("`r", "").Replace("`n", "")
+          Write-Output "::set-output name=profile::$profile"
+        azPSVersion: latest
+
+    - name: Deploy to Azure Logic App
+      uses: Azure/functions-action@v1.3.1
+      id: la
+      with:
+        app-name: ${{secrets.RG_LA}}
+        package: './output/logic.zip'
+        publish-profile: ${{steps.publishprofile.outputs.profile}}
