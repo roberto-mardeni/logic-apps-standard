@@ -84,5 +84,5 @@ jobs:
       id: la
       with:
         app-name: ${{ env.LA_NAME }}
-        package: './output/logic.zip'
+        package: './output/workflow.zip'
         publish-profile: ${{steps.publishprofile.outputs.profile}}
