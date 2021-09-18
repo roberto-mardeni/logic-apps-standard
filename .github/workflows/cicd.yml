@@ -86,3 +86,70 @@ jobs:
         app-name: ${{ env.LA_NAME }}
         package: './output/workflow.zip'
         publish-profile: ${{steps.publishprofile.outputs.profile}}
+
+
+  deploy-prd:
+    name: Deploy in Production
+    runs-on: ubuntu-latest
+    needs: [deploy-dev]
+    env:
+      NAME: prd
+      LA_NAME: mysamplelogicapp-prd
+      RG: logicapp-prd
+      LOCATION: eastus
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1    
+    
+    - name: Login via Az module
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+        enable-AzPSSession: true 
+
+    - name: Create Resource Group
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          if [ $(az group exists --name ${{ env.RG }}) = false ]; then
+              az group create --name ${{ env.RG }} --location ${{ env.LOCATION }}
+          fi
+
+    - name: Get current date
+      id: date
+      run: echo "::set-output name=date::$(date +'%Y%m%dT%H%M%S')"
+
+    # Deploy ARM template
+    - name: Run ARM deploy
+      uses: azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+        resourceGroupName: ${{ env.RG }}
+        deploymentName: azure-${{ env.NAME }}-${{ steps.date.outputs.date }}
+        template: ./src/ArmTemplates/azure.json
+        parameters: name=${{ env.LA_NAME }} environmentName=${{ env.NAME }}
+
+    - uses: actions/download-artifact@master
+      with:
+        name: workflow
+        path: ./output/
+
+    - name: Get publish Profile
+      id: publishprofile
+      uses: azure/powershell@v1
+      with:
+        inlineScript: |
+          $profile = Get-AzWebAppPublishingProfile `
+              -ResourceGroupName ${{ env.RG }} `
+              -Name ${{ env.LA_NAME }}
+          $profile = $profile.Replace("`r", "").Replace("`n", "")
+          Write-Output "::set-output name=profile::$profile"
+        azPSVersion: latest
+
+    - name: Deploy to Azure Logic App
+      uses: Azure/functions-action@v1.3.1
+      id: la
+      with:
+        app-name: ${{ env.LA_NAME }}
+        package: './output/workflow.zip'
+        publish-profile: ${{steps.publishprofile.outputs.profile}}
