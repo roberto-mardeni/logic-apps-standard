@@ -45,5 +45,5 @@ jobs:
       with:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
         resourceGroupName: ${{ env.RG }}
-        template: ./src/ArmTemplates/azuredeploy.json
+        template: ./src/ArmTemplates/azure.json
         parameters: name=${{ env.LA_NAME }}
