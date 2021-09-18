@@ -94,6 +94,24 @@
                 "Tier": "[parameters('sku')]",
                 "Name": "[parameters('skuCode')]"
             }
+        },
+        {
+            "apiVersion": "2020-02-02-preview",
+            "name": "[parameters('name')]",
+            "type": "microsoft.insights/components",
+            "location": "[resourceGroup().location]",
+            "kind": "",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[concat('microsoft.operationalinsights/workspaces/',variables('logAnalyticsWorkspaceName'))]"
+            ],
+            "properties": {
+                "ApplicationId": "[parameters('name')]",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "Flow_Type": "Redfield",
+                "Application_Type": "web",
+                "WorkspaceResourceId": "[resourceId('microsoft.operationalinsights/workspaces',variables('logAnalyticsWorkspaceName'))]"
+            }
         }
     ]
 }
