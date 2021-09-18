@@ -83,6 +83,6 @@ jobs:
       uses: Azure/functions-action@v1.3.1
       id: la
       with:
-        app-name: ${{secrets.RG_LA}}
+        app-name: ${{ env.LA_NAME }}
         package: './output/logic.zip'
         publish-profile: ${{steps.publishprofile.outputs.profile}}
