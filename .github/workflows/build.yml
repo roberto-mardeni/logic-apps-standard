@@ -20,3 +20,30 @@ jobs:
         name: workflow
         path: ./output/
         retention-days: 1
+
+  deploy-dev:
+    name: Deploy in Dev
+    runs-on: ubuntu-latest
+    needs: [build]
+    environment:
+      NAME: dev
+      LA_NAME: mysamplelogicapp-dev
+      RG: logicapp-dev
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1    
+    
+    - name: Login via Az module
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+        enable-AzPSSession: true 
+    
+    # Deploy ARM template
+    - name: Run ARM deploy
+      uses: azure/arm-deploy@v1
+      with:
+        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+        resourceGroupName: ${{ env.RG }}
+        template: ./src/ArmTemplates/azuredeploy.json
+        parameters: name=${{ env.LA_NAME }}
