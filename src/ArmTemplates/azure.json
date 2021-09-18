@@ -1,0 +1,99 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "name": {
+            "type": "string",
+            "defaultValue": "mysamplelogicapp"
+        },
+        "alwaysOn": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "use32BitWorkerProcess": {
+            "type": "bool",
+            "defaultValue": true
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "WorkflowStandard"
+        },
+        "skuCode": {
+            "type": "string",
+            "defaultValue": "WS1"
+        },
+        "workerSize": {
+            "type": "string",
+            "defaultValue": "3"
+        },
+        "workerSizeId": {
+            "type": "string",
+            "defaultValue": "3"
+        },
+        "numberOfWorkers": {
+            "type": "string",
+            "defaultValue": "1"
+        },
+        "environmentName": {
+            "type": "string",
+            "defaultValue": "dev"
+        }
+    },
+    "variables": {
+        "logAnalyticsWorkspaceName": "[concat('law-',parameters('name'))]",
+        "hostingPlanName": "[concat('asp-',parameters('name'))]",
+        "storageAccountName": "[concat('sa', substring(uniqueString(resourceGroup().id),0,6))]",
+        "tags": {
+            "Environment": "[parameters('environmentName')]"
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-10-01",
+            "name": "[variables('logAnalyticsWorkspaceName')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "properties": {
+                "sku": {
+                    "name": "pergb2018"
+                }
+            }
+        },
+        {
+            "apiVersion": "2019-06-01",
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[variables('tags')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "supportsHttpsTrafficOnly": true,
+                "minimumTlsVersion": "TLS1_2"
+            }
+        },
+        {
+            "apiVersion": "2020-12-01",
+            "name": "[variables('hostingPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "kind": "",
+            "tags": "[variables('tags')]",
+            "dependsOn": [],
+            "properties": {
+                "name": "[variables('hostingPlanName')]",
+                "workerSize": "[parameters('workerSize')]",
+                "workerSizeId": "[parameters('workerSizeId')]",
+                "numberOfWorkers": "[parameters('numberOfWorkers')]",
+                "maximumElasticWorkerCount": 20
+            },
+            "sku": {
+                "Tier": "[parameters('sku')]",
+                "Name": "[parameters('skuCode')]"
+            }
+        }
+    ]
+}
