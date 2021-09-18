@@ -29,6 +29,7 @@ jobs:
       NAME: dev
       LA_NAME: mysamplelogicapp-dev
       RG: logicapp-dev
+      LOCATION: eastus
     steps:
     - name: Checkout
       uses: actions/checkout@v1    
@@ -38,12 +39,25 @@ jobs:
       with:
         creds: ${{secrets.AZURE_CREDENTIALS}}
         enable-AzPSSession: true 
-    
+
+    - name: Create Resource Group
+      uses: azure/CLI@v1
+      with:
+        inlineScript: |
+          if [ $(az group exists --name ${{ env.RG }}) = false ]; then
+              az group create --name ${{ env.RG }} --location ${{ env.LOCATION }}
+          fi
+
+    - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%dT%H%M%S')"
+
     # Deploy ARM template
     - name: Run ARM deploy
       uses: azure/arm-deploy@v1
       with:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
         resourceGroupName: ${{ env.RG }}
+        deploymentName: azure-${{ env.NAME }}-${{ steps.date.outputs.date }}
         template: ./src/ArmTemplates/azure.json
-        parameters: name=${{ env.LA_NAME }}
+        parameters: name=${{ env.LA_NAME }} environmentName=${{ env.NAME }}
