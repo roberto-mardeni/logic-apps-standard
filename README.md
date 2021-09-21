@@ -24,8 +24,8 @@ Each of the Deployment stage will:
 
 ## References
 
-https://docs.microsoft.com/en-us/azure/logic-apps/single-tenant-overview-compare
-https://docs.microsoft.com/en-us/azure/logic-apps/create-single-tenant-workflows-visual-studio-code
-https://docs.microsoft.com/en-us/azure/developer/github/deploy-to-azure
-https://docs.microsoft.com/en-us/azure/logic-apps/set-up-devops-deployment-single-tenant-azure-logic-apps?tabs=github
-https://docs.microsoft.com/en-us/azure/templates/
+- https://docs.microsoft.com/en-us/azure/logic-apps/single-tenant-overview-compare
+- https://docs.microsoft.com/en-us/azure/logic-apps/create-single-tenant-workflows-visual-studio-code
+- https://docs.microsoft.com/en-us/azure/developer/github/deploy-to-azure
+- https://docs.microsoft.com/en-us/azure/logic-apps/set-up-devops-deployment-single-tenant-azure-logic-apps?tabs=github
+- https://docs.microsoft.com/en-us/azure/templates/
