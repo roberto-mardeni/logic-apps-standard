@@ -28,6 +28,8 @@ jobs:
     name: Deploy in Dev
     runs-on: ubuntu-latest
     needs: [build]
+    environment:
+      name: dev
     env:
       NAME: dev
       LA_NAME: mysamplelogicapp-dev
@@ -95,6 +97,8 @@ jobs:
     name: Deploy in Production
     runs-on: ubuntu-latest
     needs: [deploy-dev]
+    environment:
+      name: prd
     env:
       NAME: prd
       LA_NAME: mysamplelogicapp-prd
