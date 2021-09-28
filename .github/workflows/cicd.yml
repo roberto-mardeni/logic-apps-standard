@@ -50,7 +50,7 @@ jobs:
       with:
         inlineScript: |
           if [ $(az group exists --name ${{ env.RG }}) = false ]; then
-              az group create --name ${{ env.RG }} --location ${{ env.LOCATION }}
+              az group create --name ${{ env.RG }} --location ${{ env.LOCATION }} --tags Environment=${{ env.NAME }}
           fi
 
     - name: Get current date
@@ -119,7 +119,7 @@ jobs:
       with:
         inlineScript: |
           if [ $(az group exists --name ${{ env.RG }}) = false ]; then
-              az group create --name ${{ env.RG }} --location ${{ env.LOCATION }}
+              az group create --name ${{ env.RG }} --location ${{ env.LOCATION }} --tags Environment=${{ env.NAME }}
           fi
 
     - name: Get current date
